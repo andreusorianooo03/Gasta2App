@@ -1,41 +1,45 @@
-package com.example.gasta2app.data.local
+package com.example.gasta2app
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.gasta2app.data.dao.MovimientoDao
-import com.example.gasta2app.model.Movimiento
-import com.example.gasta2app.model.Deuda
+import com.example.gasta2app.data.dao.DeudaDao
 
 @Database(
-    entities = [Movimiento::class, Deuda::class],
-    version = 3
+    entities = [
+        Gasto::class,
+        Deuda::class,
+        GastoCompartido::class,
+        ParticipanteGasto::class
+    ],
+    version = 1
 )
-abstract class BaseDeDatos : RoomDatabase() {
+abstract class BaseDatos : RoomDatabase() {
 
-    abstract fun movimientoDao(): MovimientoDao
+    abstract fun gastoDao(): GastoDao
     abstract fun deudaDao(): DeudaDao
+    abstract fun gastoCompartidoDao(): GastoCompartidoDao
+    abstract fun participanteGastoDao(): ParticipanteGastoDao
 
     companion object {
-
         @Volatile
-        private var INSTANCE: BaseDeDatos? = null
+        private var instancia: BaseDatos? = null
 
-        fun obtenerBaseDeDatos(context: Context): BaseDeDatos {
+        fun obtener(contexto: Context): BaseDatos {
+            if (instancia != null) {
+                return instancia!!
+            }
 
-            return INSTANCE ?: synchronized(this) {
-
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    BaseDeDatos::class.java,
+            synchronized(this) {
+                val nuevaInstancia = Room.databaseBuilder(
+                    contexto.applicationContext,
+                    BaseDatos::class.java,
                     "gasta2_db"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
+                ).build()
 
-                INSTANCE = instance
-                instance
+                instancia = nuevaInstancia
+                return nuevaInstancia
             }
         }
     }

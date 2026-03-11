@@ -3,14 +3,14 @@ package com.example.gasta2app
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "deudas")
-data class Deuda(
+@Entity(tableName = "gastos_compartidos")
+data class GastoCompartido(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val deudor: String,
-    val acreedor: String,
+    val nombre: String,
+    val quienPago: String,
     val cantidad: Double,
-    val concepto: String,
+    val descripcion: String,
     val fecha: Long,
-    val pagada: Boolean = false
+    val participantes: String = ""
 )

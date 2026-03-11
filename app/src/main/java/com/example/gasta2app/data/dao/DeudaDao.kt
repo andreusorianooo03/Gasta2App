@@ -1,7 +1,11 @@
-package com.example.gasta2app.data.local
+package com.example.gasta2app.data.dao
 
-import androidx.room.*
-import com.example.gasta2app.model.Deuda
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
+import com.example.gasta2app.Deuda
 
 @Dao
 interface DeudaDao {

@@ -1,6 +1,6 @@
 package com.example.gasta2app.data.repository
 
-import com.example.gasta2app.data.local.DeudaDao
+import com.example.gasta2app.data.dao.DeudaDao
 import com.example.gasta2app.model.Deuda
 
 class DeudaRepository(private val deudaDao: DeudaDao) {
