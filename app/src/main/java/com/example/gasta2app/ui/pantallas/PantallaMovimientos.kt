@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gasta2app.ui.viewmodel.MovimientoViewModel
@@ -20,6 +21,7 @@ fun PantallaMovimientos(
     val listaMovimientos by viewModel.listaMovimientos.observeAsState(emptyList())
 
     val balance = listaMovimientos.sumOf {
+
         if (it.tipo == "ingreso") it.cantidad else -it.cantidad
     }
 
@@ -34,13 +36,13 @@ fun PantallaMovimientos(
             ) {
                 Text("+")
             }
-
         }
 
     ) { padding ->
 
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
         ) {
@@ -60,6 +62,10 @@ fun PantallaMovimientos(
             LazyColumn {
 
                 items(listaMovimientos) { movimiento ->
+
+                    val colorCantidad =
+                        if (movimiento.tipo == "ingreso") Color(0xFF2E7D32)
+                        else Color(0xFFC62828)
 
                     Card(
                         modifier = Modifier
@@ -81,12 +87,20 @@ fun PantallaMovimientos(
                                     style = MaterialTheme.typography.titleMedium
                                 )
 
-                                Text(text = movimiento.tipo)
+                                Text("Categoría: ${movimiento.categoria}")
+
+                                Text("Tipo: ${movimiento.tipo}")
                             }
 
                             Column {
 
-                                Text(text = "${movimiento.cantidad} €")
+                                Text(
+                                    text = "${movimiento.cantidad} €",
+                                    color = colorCantidad,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
 
                                 Button(
                                     onClick = {

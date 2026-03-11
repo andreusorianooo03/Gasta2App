@@ -6,11 +6,16 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.gasta2app.data.dao.MovimientoDao
 import com.example.gasta2app.model.Movimiento
+import com.example.gasta2app.model.Deuda
 
-@Database(entities = [Movimiento::class], version = 1)
+@Database(
+    entities = [Movimiento::class, Deuda::class],
+    version = 3
+)
 abstract class BaseDeDatos : RoomDatabase() {
 
     abstract fun movimientoDao(): MovimientoDao
+    abstract fun deudaDao(): DeudaDao
 
     companion object {
 
@@ -25,7 +30,9 @@ abstract class BaseDeDatos : RoomDatabase() {
                     context.applicationContext,
                     BaseDeDatos::class.java,
                     "gasta2_db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
 
                 INSTANCE = instance
                 instance
