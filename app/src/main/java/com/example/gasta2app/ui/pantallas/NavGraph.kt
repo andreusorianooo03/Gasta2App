@@ -50,7 +50,7 @@ fun NavGraph(
             }
 
             composable("grupos") {
-                PantallaGrupos()
+                PantallaGrupos(navController)
             }
 
             composable("agregarMovimiento") {

@@ -1,45 +1,42 @@
-package com.example.gasta2app
+package com.example.gasta2app.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.gasta2app.data.dao.DeudaDao
+import com.example.gasta2app.data.dao.MovimientoDao
+import com.example.gasta2app.model.Movimiento
+import com.example.gasta2app.model.Deuda
 
 @Database(
-    entities = [
-        Gasto::class,
-        Deuda::class,
-        GastoCompartido::class,
-        ParticipanteGasto::class
-    ],
-    version = 1
+    entities = [Movimiento::class, Deuda::class],
+    version = 3
 )
-abstract class BaseDatos : RoomDatabase() {
+abstract class BaseDeDatos : RoomDatabase() {
 
-    abstract fun gastoDao(): GastoDao
+    abstract fun movimientoDao(): MovimientoDao
     abstract fun deudaDao(): DeudaDao
-    abstract fun gastoCompartidoDao(): GastoCompartidoDao
-    abstract fun participanteGastoDao(): ParticipanteGastoDao
 
     companion object {
+
         @Volatile
-        private var instancia: BaseDatos? = null
+        private var INSTANCE: BaseDeDatos? = null
 
-        fun obtener(contexto: Context): BaseDatos {
-            if (instancia != null) {
-                return instancia!!
-            }
+        fun obtenerBaseDeDatos(context: Context): BaseDeDatos {
 
-            synchronized(this) {
-                val nuevaInstancia = Room.databaseBuilder(
-                    contexto.applicationContext,
-                    BaseDatos::class.java,
+            return INSTANCE ?: synchronized(this) {
+
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    BaseDeDatos::class.java,
                     "gasta2_db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
 
-                instancia = nuevaInstancia
-                return nuevaInstancia
+                INSTANCE = instance
+                instance
             }
         }
     }
