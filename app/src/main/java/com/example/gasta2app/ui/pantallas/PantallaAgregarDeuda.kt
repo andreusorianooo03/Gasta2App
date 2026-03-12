@@ -8,19 +8,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.gasta2app.model.Movimiento
+import com.example.gasta2app.model.Deuda
 import com.example.gasta2app.ui.theme.AzulClaroSuave
-import com.example.gasta2app.ui.viewmodel.MovimientoViewModel
+import com.example.gasta2app.ui.viewmodel.DeudaViewModel
 
 @Composable
-fun PantallaAgregarMovimiento(
+fun PantallaAgregarDeuda(
     navController: NavController,
-    viewModel: MovimientoViewModel
+    viewModel: DeudaViewModel
 ) {
 
-    var descripcion by remember { mutableStateOf("") }
+    var persona by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
-    var tipo by remember { mutableStateOf("gasto") }
+    var tipo by remember { mutableStateOf("me deben") }
 
     Column(
         modifier = Modifier
@@ -32,7 +32,7 @@ fun PantallaAgregarMovimiento(
     ) {
 
         Text(
-            text = "Nuevo movimiento",
+            text = "Añadir deuda",
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -49,9 +49,9 @@ fun PantallaAgregarMovimiento(
             ) {
 
                 OutlinedTextField(
-                    value = descripcion,
-                    onValueChange = { descripcion = it },
-                    label = { Text("Descripción") },
+                    value = persona,
+                    onValueChange = { persona = it },
+                    label = { Text("Persona") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -67,7 +67,7 @@ fun PantallaAgregarMovimiento(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Tipo de movimiento",
+                    text = "Tipo de deuda",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -77,9 +77,9 @@ fun PantallaAgregarMovimiento(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     FilledTonalButton(
-                        onClick = { tipo = "gasto" },
+                        onClick = { tipo = "me deben" },
                         modifier = Modifier.weight(1f),
-                        colors = if (tipo == "gasto") {
+                        colors = if (tipo == "me deben") {
                             ButtonDefaults.filledTonalButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -88,13 +88,13 @@ fun PantallaAgregarMovimiento(
                             ButtonDefaults.filledTonalButtonColors()
                         }
                     ) {
-                        Text("Gasto")
+                        Text("Me deben")
                     }
 
                     FilledTonalButton(
-                        onClick = { tipo = "ingreso" },
+                        onClick = { tipo = "debo" },
                         modifier = Modifier.weight(1f),
-                        colors = if (tipo == "ingreso") {
+                        colors = if (tipo == "debo") {
                             ButtonDefaults.filledTonalButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -103,7 +103,7 @@ fun PantallaAgregarMovimiento(
                             ButtonDefaults.filledTonalButtonColors()
                         }
                     ) {
-                        Text("Ingreso")
+                        Text("Debo")
                     }
                 }
             }
@@ -113,29 +113,26 @@ fun PantallaAgregarMovimiento(
 
         Button(
             onClick = {
-
-                if (descripcion.isNotEmpty() && cantidad.isNotEmpty()) {
+                if (persona.isNotBlank() && cantidad.isNotBlank()) {
 
                     val cantidadNormalizada = cantidad.replace(",", ".")
                     val cantidadDouble = cantidadNormalizada.toDoubleOrNull()
 
                     if (cantidadDouble != null && cantidadDouble > 0.0) {
-                        val movimiento = Movimiento(
-                            tipo = tipo,
+                        val deuda = Deuda(
+                            persona = persona,
                             cantidad = cantidadDouble,
-                            categoria = "", // ya no usamos categorías en la UI
-                            descripcion = descripcion
+                            tipo = tipo
                         )
 
-                        viewModel.insertarMovimiento(movimiento)
+                        viewModel.insertar(deuda)
                         navController.popBackStack()
                     }
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-
-            Text("Guardar movimiento")
+            Text("Guardar deuda")
         }
     }
 }

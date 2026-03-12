@@ -2,10 +2,10 @@ package com.example.gasta2app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val AzulClaroPrimario = Color(0xFF4A90E2)
+val AzulClaroSecundario = Color(0xFF78B4FF)
+val AzulClaroSuave = Color(0xFFE6F2FF)
+val AzulOscuroTexto = Color(0xFF12324F)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val VerdeSuave = Color(0xFFB9E6C9)
+val RojoSuave = Color(0xFFF8C4C4)

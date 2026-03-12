@@ -1,15 +1,22 @@
 package com.example.gasta2app.ui.pantallas
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.gasta2app.ui.theme.AzulClaroPrimario
+import com.example.gasta2app.ui.theme.AzulClaroSuave
+import com.example.gasta2app.ui.theme.VerdeSuave
+import com.example.gasta2app.ui.theme.RojoSuave
 import com.example.gasta2app.ui.viewmodel.MovimientoViewModel
 
 @Composable
@@ -21,56 +28,85 @@ fun PantallaMovimientos(
     val listaMovimientos by viewModel.listaMovimientos.observeAsState(emptyList())
 
     val balance = listaMovimientos.sumOf {
-
         if (it.tipo == "ingreso") it.cantidad else -it.cantidad
     }
 
     Scaffold(
-
         floatingActionButton = {
-
             FloatingActionButton(
                 onClick = {
                     navController.navigate("agregarMovimiento")
                 }
             ) {
-                Text("+")
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Añadir movimiento"
+                )
             }
         }
-
     ) { padding ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(AzulClaroSuave)
                 .padding(padding)
-                .padding(16.dp)
         ) {
 
-            Text(
-                text = "Balance total",
-                style = MaterialTheme.typography.titleLarge
-            )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = AzulClaroPrimario
+                ),
+                shape = MaterialTheme.shapes.large,
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    Text(
+                        text = String.format("%.2f €", balance),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "$balance €",
-                style = MaterialTheme.typography.headlineMedium
+                text = "Movimientos",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp)
+            ) {
 
                 items(listaMovimientos) { movimiento ->
 
-                    val colorCantidad =
-                        if (movimiento.tipo == "ingreso") Color(0xFF2E7D32)
-                        else Color(0xFFC62828)
+                    val colorFondo =
+                        if (movimiento.tipo == "ingreso") VerdeSuave else RojoSuave
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
+                            .padding(vertical = 4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorFondo
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
 
                         Row(
@@ -80,35 +116,28 @@ fun PantallaMovimientos(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
-                            Column {
-
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
                                 Text(
                                     text = movimiento.descripcion,
                                     style = MaterialTheme.typography.titleMedium
                                 )
-
-                                Text("Categoría: ${movimiento.categoria}")
-
-                                Text("Tipo: ${movimiento.tipo}")
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = String.format("%.2f €", movimiento.cantidad),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
                             }
 
-                            Column {
-
-                                Text(
-                                    text = "${movimiento.cantidad} €",
-                                    color = colorCantidad,
-                                    style = MaterialTheme.typography.titleMedium
+                            IconButton(
+                                onClick = { viewModel.eliminarMovimiento(movimiento) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Eliminar",
+                                    tint = MaterialTheme.colorScheme.error
                                 )
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Button(
-                                    onClick = {
-                                        viewModel.eliminarMovimiento(movimiento)
-                                    }
-                                ) {
-                                    Text("Eliminar")
-                                }
                             }
                         }
                     }

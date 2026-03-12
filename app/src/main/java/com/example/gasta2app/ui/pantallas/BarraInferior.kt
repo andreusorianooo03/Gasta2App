@@ -29,7 +29,7 @@ fun BarraInferior(navController: NavController) {
             selected = currentRoute == "estadisticas",
             onClick = { navController.navigate("estadisticas") },
             icon = { Icon(Icons.Filled.BarChart, contentDescription = null) },
-            label = { Text("Stats") }
+            label = { Text("Estadísticas") }
         )
 
         NavigationBarItem(
