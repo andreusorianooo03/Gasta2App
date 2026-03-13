@@ -123,7 +123,7 @@ fun PantallaAgregarMovimiento(
                         val movimiento = Movimiento(
                             tipo = tipo,
                             cantidad = cantidadDouble,
-                            categoria = "", // ya no usamos categorías en la UI
+                            categoria = "",
                             descripcion = descripcion
                         )
 
