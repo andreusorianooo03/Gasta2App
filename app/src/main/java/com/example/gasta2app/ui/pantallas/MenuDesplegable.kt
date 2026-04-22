@@ -31,13 +31,11 @@ fun MenuDesplegable(opciones: List<String>, onSeleccionar: (String) -> Unit) {
             DropdownMenuItem(
                 text = { Text(it) },
                 onClick = {
-
                     seleccionado = it
 
                     expanded = false
 
                     onSeleccionar(it)
-
                 }
             )
 
