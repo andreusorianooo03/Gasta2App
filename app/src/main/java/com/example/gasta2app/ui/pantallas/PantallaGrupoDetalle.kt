@@ -238,7 +238,7 @@ fun PantallaGrupoDetalle(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     if (participantes.isNotEmpty()) {
-                        DropdownMenuDemo(
+                        MenuDesplegable(
                             opciones = participantes,
                             onSeleccionar = { pagadorEdit = it }
                         )
@@ -280,7 +280,7 @@ private fun SeccionAnadirGasto(
         Spacer(modifier = Modifier.height(8.dp))
 
         if (participantes.isNotEmpty()) {
-            DropdownMenuDemo(opciones = participantes, onSeleccionar = onPagadorSeleccionado)
+            MenuDesplegable(opciones = participantes, onSeleccionar = onPagadorSeleccionado)
         }
 
         Spacer(modifier = Modifier.height(8.dp))

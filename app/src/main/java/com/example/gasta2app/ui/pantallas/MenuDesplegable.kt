@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
-fun DropdownMenuDemo(opciones: List<String>, onSeleccionar: (String) -> Unit) {
+fun MenuDesplegable(opciones: List<String>, onSeleccionar: (String) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
