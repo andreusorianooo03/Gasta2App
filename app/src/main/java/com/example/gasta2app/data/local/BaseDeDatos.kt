@@ -29,7 +29,6 @@ abstract class BaseDeDatos : RoomDatabase() {
 
     abstract fun movimientoDao(): MovimientoDao
     abstract fun deudaDao(): DeudaDao
-
     abstract fun gastoConjuntoDao(): GastoConjuntoDao
     abstract fun participanteDao(): ParticipanteDao
     abstract fun gastoDao(): GastoDao
