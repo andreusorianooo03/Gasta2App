@@ -1,5 +1,6 @@
 package com.example.gasta2app.ui.pantallas
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,17 +12,29 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
-import com.example.gasta2app.model.Grupo
 import com.example.gasta2app.ui.theme.AzulClaroSuave
+import com.example.gasta2app.ui.viewmodel.GastoConjuntoViewModel
 
 @Composable
-fun PantallaGrupos(navController: NavController) {
-
-    val listaGrupos = remember { mutableStateListOf<Grupo>() }
+fun PantallaGrupos(
+    navController: NavController,
+    viewModel: GastoConjuntoViewModel
+) {
+    val listaGrupos by viewModel.listaGrupos.observeAsState(emptyList())
+    val mensajeUi by viewModel.mensajeUi.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
     var mostrarDialogoCrearGrupo by remember { mutableStateOf(false) }
 
+    LaunchedEffect(mensajeUi) {
+        val mensaje = mensajeUi ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(mensaje)
+        viewModel.limpiarMensajeUi()
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -58,6 +71,9 @@ fun PantallaGrupos(navController: NavController) {
             ) {
 
                 items(listaGrupos) { grupo ->
+                    val participantes by viewModel
+                        .obtenerParticipantes(grupo.id)
+                        .observeAsState(emptyList())
 
                     Card(
                         modifier = Modifier
@@ -82,10 +98,12 @@ fun PantallaGrupos(navController: NavController) {
                                     text = grupo.nombre,
                                     style = MaterialTheme.typography.titleMedium
                                 )
-                                if (grupo.participantes.isNotEmpty()) {
+                                if (participantes.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "Participantes: ${grupo.participantes.joinToString(", ")}",
+                                        text = "Participantes: ${
+                                            participantes.joinToString(", ") { it.nombre }
+                                        }",
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
@@ -93,10 +111,8 @@ fun PantallaGrupos(navController: NavController) {
 
                             FilledTonalButton(
                                 onClick = {
-                                    val participantesStr =
-                                        grupo.participantes.joinToString("|")
                                     navController.navigate(
-                                        "grupoDetalle/${grupo.nombre}/$participantesStr"
+                                        "grupoDetalle/${grupo.id}/${Uri.encode(grupo.nombre)}"
                                     )
                                 }
                             ) {
@@ -118,8 +134,10 @@ fun PantallaGrupos(navController: NavController) {
         DialogoCrearGrupo(
             onCerrar = { mostrarDialogoCrearGrupo = false },
             onCrear = { nombre, participantes ->
-                listaGrupos.add(Grupo(nombre = nombre, participantes = participantes))
-                mostrarDialogoCrearGrupo = false
+                viewModel.crearGrupo(nombre = nombre, participantes = participantes)
+                if (nombre.isNotBlank() && participantes.any { it.isNotBlank() }) {
+                    mostrarDialogoCrearGrupo = false
+                }
             }
         )
     }

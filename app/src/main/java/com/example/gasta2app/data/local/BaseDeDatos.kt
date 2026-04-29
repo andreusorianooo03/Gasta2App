@@ -39,19 +39,28 @@ abstract class BaseDeDatos : RoomDatabase() {
         private var INSTANCE: BaseDeDatos? = null
 
         fun obtenerBaseDeDatos(context: Context): BaseDeDatos {
+            // Double-check locking: evita crear mas de una instancia cuando varios hilos
+            // intentan inicializar la base de datos al mismo tiempo.
+            val instanciaActual = INSTANCE
+            if (instanciaActual != null) {
+                return instanciaActual
+            }
 
-            return INSTANCE ?: synchronized(this) {
-
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    BaseDeDatos::class.java,
-                    "gasta2_db"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
-
-                INSTANCE = instance
-                instance
+            return synchronized(this) {
+                val instanciaSincronizada = INSTANCE
+                if (instanciaSincronizada != null) {
+                    instanciaSincronizada
+                } else {
+                    val nuevaInstancia = Room.databaseBuilder(
+                        context.applicationContext,
+                        BaseDeDatos::class.java,
+                        "gasta2_db"
+                    )
+                        .fallbackToDestructiveMigration()
+                        .build()
+                    INSTANCE = nuevaInstancia
+                    nuevaInstancia
+                }
             }
         }
     }

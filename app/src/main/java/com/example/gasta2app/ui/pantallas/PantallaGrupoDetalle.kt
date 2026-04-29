@@ -3,157 +3,143 @@ package com.example.gasta2app.ui.pantallas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.gasta2app.model.Gasto
 import com.example.gasta2app.ui.theme.AzulClaroSuave
-
-data class GastoGrupo(
-    val descripcion: String,
-    val cantidad: Double,
-    val pagador: String
-)
+import com.example.gasta2app.ui.viewmodel.GastoConjuntoViewModel
 
 @Composable
 fun PantallaGrupoDetalle(
+    grupoId: Int,
     nombreGrupo: String,
-    participantesIniciales: List<String>
+    viewModel: GastoConjuntoViewModel
 ) {
-
-    val participantes = remember {
-        mutableStateListOf<String>().apply { addAll(participantesIniciales) }
-    }
-    val gastos = remember { mutableStateListOf<GastoGrupo>() }
+    val participantes by viewModel.obtenerParticipantes(grupoId).observeAsState(emptyList())
+    val gastos by viewModel.obtenerGastos(grupoId).observeAsState(emptyList())
+    val mensajeUi by viewModel.mensajeUi.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var descripcion by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var pagador by remember { mutableStateOf("") }
-
     var deudasEntreParticipantes by remember { mutableStateOf<List<String>>(emptyList()) }
     var mostrarDialogoResumen by remember { mutableStateOf(false) }
 
-    var indiceEditando by remember { mutableStateOf<Int?>(null) }
-    var descripcionEdit by remember { mutableStateOf("") }
-    var cantidadEdit by remember { mutableStateOf("") }
-    var pagadorEdit by remember { mutableStateOf("") }
+    LaunchedEffect(mensajeUi) {
+        val mensaje = mensajeUi ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(mensaje)
+        viewModel.limpiarMensajeUi()
+    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AzulClaroSuave)
-            .padding(16.dp)
-    ) {
-
-        Text(
-            text = nombreGrupo,
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AzulClaroSuave)
+                .padding(padding)
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+            Text(
+                text = nombreGrupo,
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-
-                Text(
-                    text = "Participantes",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                participantes.forEach { participante ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
                     Text(
-                        text = participante,
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "Participantes",
+                        style = MaterialTheme.typography.titleMedium
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    participantes.forEach { participante ->
+                        Text(
+                            text = participante.nombre,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Gastos",
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-                Text(
-                    text = "Gastos",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                SeccionAnadirGasto(
-                    descripcion = descripcion,
-                    onDescripcionChange = { descripcion = it },
-                    cantidad = cantidad,
-                    onCantidadChange = { cantidad = it },
-                    participantes = participantes,
-                    onPagadorSeleccionado = { pagador = it },
-                    onAgregarGasto = {
-                        if (descripcion.isNotBlank() && cantidad.isNotBlank() && pagador.isNotBlank()) {
-                            val cantidadNormalizada = cantidad.replace(",", ".")
-                            val cantidadDouble = cantidadNormalizada.toDoubleOrNull()
-
-                            if (cantidadDouble != null && cantidadDouble > 0.0) {
-                                gastos.add(
-                                    GastoGrupo(
-                                        descripcion = descripcion,
-                                        cantidad = cantidadDouble,
-                                        pagador = pagador
-                                    )
-                                )
+                    SeccionAnadirGasto(
+                        descripcion = descripcion,
+                        onDescripcionChange = { descripcion = it },
+                        cantidad = cantidad,
+                        onCantidadChange = { cantidad = it },
+                        participantes = participantes.map { it.nombre },
+                        onPagadorSeleccionado = { pagador = it },
+                        onAgregarGasto = {
+                            viewModel.agregarGasto(
+                                grupoId = grupoId,
+                                descripcion = descripcion,
+                                cantidadTexto = cantidad,
+                                pagador = pagador
+                            )
+                            if (descripcion.isNotBlank() && cantidad.isNotBlank() && pagador.isNotBlank()) {
                                 descripcion = ""
                                 cantidad = ""
+                                pagador = ""
                             }
                         }
-                    }
-                )
+                    )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                ListaGastos(
-                    gastos = gastos,
-                    onEditar = { index, gasto ->
-                        indiceEditando = index
-                        descripcionEdit = gasto.descripcion
-                        cantidadEdit = gasto.cantidad.toString()
-                        pagadorEdit = gasto.pagador
-                    }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                deudasEntreParticipantes = calcularDeudasEntreParticipantes(
-                    participantes = participantes,
-                    gastos = gastos
-                )
-                if (deudasEntreParticipantes.isNotEmpty()) {
-                    mostrarDialogoResumen = true
+                    ListaGastos(gastos = gastos)
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Calcular")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    deudasEntreParticipantes = calcularDeudasEntreParticipantes(
+                        participantes = participantes.map { it.nombre },
+                        gastos = gastos
+                    )
+                    if (deudasEntreParticipantes.isNotEmpty()) {
+                        mostrarDialogoResumen = true
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Calcular")
+            }
         }
     }
 
@@ -161,87 +147,16 @@ fun PantallaGrupoDetalle(
         AlertDialog(
             onDismissRequest = { mostrarDialogoResumen = false },
             confirmButton = {
-                Button(
-                    onClick = {
-                        mostrarDialogoResumen = false
-                    }
-                ) {
+                Button(onClick = { mostrarDialogoResumen = false }) {
                     Text("Cerrar")
                 }
             },
-            title = {
-                Text("Resumen de deudas")
-            },
+            title = { Text("Resumen de deudas") },
             text = {
                 Column {
                     deudasEntreParticipantes.forEach { linea ->
                         Text(linea)
                         Spacer(modifier = Modifier.height(4.dp))
-                    }
-                }
-            }
-        )
-    }
-
-    if (indiceEditando != null) {
-        AlertDialog(
-            onDismissRequest = { indiceEditando = null },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val index = indiceEditando
-                        if (index != null &&
-                            descripcionEdit.isNotBlank() &&
-                            cantidadEdit.isNotBlank() &&
-                            pagadorEdit.isNotBlank()
-                        ) {
-                            val cantidadNormalizada = cantidadEdit.replace(",", ".")
-                            val cantidadDouble = cantidadNormalizada.toDoubleOrNull()
-                            if (cantidadDouble != null && cantidadDouble > 0.0) {
-                                gastos[index] = GastoGrupo(
-                                    descripcion = descripcionEdit,
-                                    cantidad = cantidadDouble,
-                                    pagador = pagadorEdit
-                                )
-                                indiceEditando = null
-                            }
-                        }
-                    }
-                ) {
-                    Text("Guardar")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { indiceEditando = null }) {
-                    Text("Cancelar")
-                }
-            },
-            title = { Text("Editar gasto") },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = descripcionEdit,
-                        onValueChange = { descripcionEdit = it },
-                        label = { Text("Descripción") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = cantidadEdit,
-                        onValueChange = { cantidadEdit = it },
-                        label = { Text("Cantidad") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (participantes.isNotEmpty()) {
-                        MenuDesplegable(
-                            opciones = participantes,
-                            onSeleccionar = { pagadorEdit = it }
-                        )
                     }
                 }
             }
@@ -293,11 +208,10 @@ private fun SeccionAnadirGasto(
 
 @Composable
 private fun ListaGastos(
-    gastos: List<GastoGrupo>,
-    onEditar: (Int, GastoGrupo) -> Unit
+    gastos: List<Gasto>
 ) {
     LazyColumn {
-        itemsIndexed(gastos) { index, gasto ->
+        items(gastos) { gasto ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -305,13 +219,10 @@ private fun ListaGastos(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "${gasto.descripcion} - ${gasto.cantidad}€ (${gasto.pagador})",
+                    text = "${gasto.descripcion} - ${gasto.cantidad}€ (${gasto.pagadoPor})",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(1f)
                 )
-                TextButton(onClick = { onEditar(index, gasto) }) {
-                    Text("Editar")
-                }
             }
         }
     }
@@ -319,7 +230,7 @@ private fun ListaGastos(
 
 private fun calcularDeudasEntreParticipantes(
     participantes: List<String>,
-    gastos: List<GastoGrupo>
+    gastos: List<Gasto>
 ): List<String> {
     if (participantes.isEmpty() || gastos.isEmpty()) return emptyList()
 
@@ -330,8 +241,8 @@ private fun calcularDeudasEntreParticipantes(
         participantes.forEach { this[it] = 0.0 }
     }
     gastos.forEach { gasto ->
-        pagadoPorPersona[gasto.pagador] =
-            (pagadoPorPersona[gasto.pagador] ?: 0.0) + gasto.cantidad
+        pagadoPorPersona[gasto.pagadoPor] =
+            (pagadoPorPersona[gasto.pagadoPor] ?: 0.0) + gasto.cantidad
     }
 
     val resultados = mutableListOf<String>()

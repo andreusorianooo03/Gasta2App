@@ -8,7 +8,7 @@ import com.example.gasta2app.model.Gasto
 interface GastoDao {
 
     @Insert
-    suspend fun insertar(gasto: Gasto)
+    suspend fun insertar(gasto: Gasto): Long
 
     @Query("SELECT * FROM gastos WHERE gastoConjuntoId = :id")
     fun obtenerGastos(id: Int): LiveData<List<Gasto>>
