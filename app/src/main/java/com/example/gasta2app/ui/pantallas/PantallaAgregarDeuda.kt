@@ -111,7 +111,6 @@ fun PantallaAgregarDeuda(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-
         Button(
             onClick = {
                 if (persona.isNotBlank() && cantidad.isNotBlank()) {
