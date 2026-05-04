@@ -39,8 +39,6 @@ abstract class BaseDeDatos : RoomDatabase() {
         private var INSTANCE: BaseDeDatos? = null
 
         fun obtenerBaseDeDatos(context: Context): BaseDeDatos {
-            // Double-check locking: evita crear mas de una instancia cuando varios hilos
-            // intentan inicializar la base de datos al mismo tiempo.
             val instanciaActual = INSTANCE
             if (instanciaActual != null) {
                 return instanciaActual

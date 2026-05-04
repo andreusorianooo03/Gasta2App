@@ -13,7 +13,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.gasta2app.model.Deuda
 import com.example.gasta2app.ui.theme.AzulClaroSuave
 import com.example.gasta2app.ui.theme.VerdeSuave
 import com.example.gasta2app.ui.theme.RojoSuave
