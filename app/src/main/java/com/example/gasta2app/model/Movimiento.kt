@@ -13,7 +13,5 @@ data class Movimiento(
 
     val cantidad: Double,
 
-    val categoria: String,
-
     val descripcion: String
 )
