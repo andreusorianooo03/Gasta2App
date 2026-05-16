@@ -31,7 +31,11 @@ class GastoConjuntoViewModel(
     fun obtenerGastos(grupoId: Int): LiveData<List<Gasto>> {
         return repository.obtenerGastos(grupoId)
     }
-    fun crearGrupo(nombre: String, participantes: List<String>) {
+    fun crearGrupo(
+        nombre: String,
+        participantes:
+        List<String>
+    ) {
         val nombreLimpio = nombre.trim()
         val participantesLimpios = participantes.map { it.trim() }.filter { it.isNotBlank() }
 
