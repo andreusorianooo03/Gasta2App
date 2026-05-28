@@ -28,7 +28,7 @@ fun DialogoCrearGrupo(
                     .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                OutlinedButton(onClick = { onCerrar() }) {
+                Button (onClick = { onCerrar() }) {
                     Text("Cancelar")
                 }
                 Button(
