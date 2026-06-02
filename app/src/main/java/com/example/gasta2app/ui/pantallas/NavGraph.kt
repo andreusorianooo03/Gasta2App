@@ -1,5 +1,7 @@
 package com.example.gasta2app.ui.pantallas
 
+
+import com.example.gasta2app.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,11 +21,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.gasta2app.R
 import com.example.gasta2app.ui.viewmodel.MovimientoViewModel
 import com.example.gasta2app.ui.viewmodel.DeudaViewModel
 import com.example.gasta2app.ui.viewmodel.GastoConjuntoViewModel
 import kotlinx.coroutines.delay
+
 
 @Composable
 fun NavGraph(
