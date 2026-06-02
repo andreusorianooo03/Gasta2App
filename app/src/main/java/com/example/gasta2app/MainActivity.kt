@@ -6,11 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.example.gasta2app.data.local.BaseDeDatos
 import com.example.gasta2app.data.repository.DeudaRepository
+import com.example.gasta2app.data.repository.GastoConjuntoRepository
 import com.example.gasta2app.data.repository.MovimientoRepository
 import com.example.gasta2app.ui.pantallas.NavGraph
 import com.example.gasta2app.ui.theme.Gasta2AppTheme
 import com.example.gasta2app.ui.viewmodel.DeudaViewModel
 import com.example.gasta2app.ui.viewmodel.DeudaViewModelFactory
+import com.example.gasta2app.ui.viewmodel.GastoConjuntoViewModel
+import com.example.gasta2app.ui.viewmodel.GastoConjuntoViewModelFactory
 import com.example.gasta2app.ui.viewmodel.MovimientoViewModel
 import com.example.gasta2app.ui.viewmodel.MovimientoViewModelFactory
 
@@ -24,16 +27,28 @@ class MainActivity : ComponentActivity() {
         val factory = MovimientoViewModelFactory(repository)
         val deudaRepository = DeudaRepository(baseDeDatos.deudaDao())
         val deudaFactory = DeudaViewModelFactory(deudaRepository)
+        val gastoConjuntoRepository = GastoConjuntoRepository(
+            gastoConjuntoDao = baseDeDatos.gastoConjuntoDao(),
+            participanteDao = baseDeDatos.participanteDao(),
+            gastoDao = baseDeDatos.gastoDao()
+        )
+        val gastoConjuntoFactory = GastoConjuntoViewModelFactory(gastoConjuntoRepository)
 
         val viewModel = ViewModelProvider(this, factory)
             .get(MovimientoViewModel::class.java)
 
         val deudaViewModel = ViewModelProvider(this, deudaFactory)
             .get(DeudaViewModel::class.java)
+        val gastoConjuntoViewModel = ViewModelProvider(this, gastoConjuntoFactory)
+            .get(GastoConjuntoViewModel::class.java)
 
         setContent {
             Gasta2AppTheme {
-                NavGraph(viewModel = viewModel, deudaViewModel = deudaViewModel)
+                NavGraph(
+                    viewModel = viewModel,
+                    deudaViewModel = deudaViewModel,
+                    gastoConjuntoViewModel = gastoConjuntoViewModel
+                )
             }
         }
     }

@@ -13,7 +13,5 @@ data class Deuda(
 
     val cantidad: Double,
 
-    val tipo: String,
-
-    val pagada: Boolean = false
+    val tipo: String
 )

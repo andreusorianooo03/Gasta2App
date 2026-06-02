@@ -21,6 +21,7 @@ fun PantallaAgregarDeuda(
     var persona by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var tipo by remember { mutableStateOf("me deben") }
+    var mensajeError by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -113,12 +114,23 @@ fun PantallaAgregarDeuda(
 
         Button(
             onClick = {
-                if (persona.isNotBlank() && cantidad.isNotBlank()) {
 
-                    val cantidadNormalizada = cantidad.replace(",", ".")
-                    val cantidadDouble = cantidadNormalizada.toDoubleOrNull()
+                if (persona.isBlank()) {
 
-                    if (cantidadDouble != null && cantidadDouble > 0.0) {
+                    mensajeError = "Introduce una persona"
+
+                } else {
+
+                    val cantidadDouble = cantidad.replace(",", ".").toDoubleOrNull()
+
+                    if (cantidadDouble == null || cantidadDouble <= 0.0) {
+
+                        mensajeError = "Introduce una cantidad válida"
+
+                    } else {
+
+                        mensajeError = ""
+
                         val deuda = Deuda(
                             persona = persona,
                             cantidad = cantidadDouble,
@@ -133,6 +145,15 @@ fun PantallaAgregarDeuda(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Guardar deuda")
+        }
+        if (mensajeError.isNotEmpty()) {
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = mensajeError,
+                color = MaterialTheme.colorScheme.error
+            )
         }
     }
 }

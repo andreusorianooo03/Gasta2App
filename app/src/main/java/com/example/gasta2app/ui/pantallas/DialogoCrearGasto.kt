@@ -17,6 +17,7 @@ fun DialogoCrearGrupo(
     var nombre by remember { mutableStateOf("") }
     var nombreParticipante by remember { mutableStateOf("") }
     val participantes = remember { mutableStateListOf<String>() }
+    var error by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
         onDismissRequest = { onCerrar() },
@@ -27,12 +28,17 @@ fun DialogoCrearGrupo(
                     .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                OutlinedButton(onClick = { onCerrar() }) {
+                Button (onClick = { onCerrar() }) {
                     Text("Cancelar")
                 }
                 Button(
                     onClick = {
-                        if (nombre.isNotBlank()) {
+                        if (nombre.isBlank()) {
+                            error = "Debes introducir un nombre de grupo."
+                        } else if (participantes.isEmpty()) {
+                            error = "Debes agregar al menos un participante."
+                        } else {
+                            error = null
                             onCrear(nombre, participantes.toList())
                         }
                     }
@@ -102,6 +108,15 @@ fun DialogoCrearGrupo(
                             )
                         }
                     }
+                }
+
+                error?.let { mensaje ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = mensaje,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }

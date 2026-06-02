@@ -8,12 +8,9 @@ import com.example.gasta2app.model.GastoConjunto
 interface GastoConjuntoDao {
 
     @Insert
-    suspend fun insertar(gastoConjunto: GastoConjunto)
+    suspend fun insertar(gastoConjunto: GastoConjunto): Long
 
     @Query("SELECT * FROM gastos_conjuntos")
     fun obtenerTodos(): LiveData<List<GastoConjunto>>
-
-    @Query("SELECT MAX(id) FROM gastos_conjuntos")
-    suspend fun obtenerUltimoId(): Int
 
 }

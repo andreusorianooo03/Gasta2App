@@ -21,6 +21,7 @@ fun PantallaAgregarMovimiento(
     var descripcion by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var tipo by remember { mutableStateOf("gasto") }
+    var mensajeError by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -114,16 +115,23 @@ fun PantallaAgregarMovimiento(
         Button(
             onClick = {
 
-                if (descripcion.isNotEmpty() && cantidad.isNotEmpty()) {
+                if (descripcion.isBlank()) {
+                    mensajeError = "Introduce una descripción"
+                } else {
 
-                    val cantidadNormalizada = cantidad.replace(",", ".")
-                    val cantidadDouble = cantidadNormalizada.toDoubleOrNull()
+                    val cantidadDouble = cantidad.replace(",", ".").toDoubleOrNull()
 
-                    if (cantidadDouble != null && cantidadDouble > 0.0) {
+                    if (cantidadDouble == null || cantidadDouble <= 0.0) {
+
+                        mensajeError = "Introduce una cantidad válida"
+
+                    } else {
+
+                        mensajeError = ""
+
                         val movimiento = Movimiento(
                             tipo = tipo,
                             cantidad = cantidadDouble,
-                            categoria = "", // ya no usamos categorías en la UI
                             descripcion = descripcion
                         )
 
@@ -136,6 +144,15 @@ fun PantallaAgregarMovimiento(
         ) {
 
             Text("Guardar movimiento")
+        }
+        if (mensajeError.isNotEmpty()) {
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = mensajeError,
+                color = MaterialTheme.colorScheme.error
+            )
         }
     }
 }
